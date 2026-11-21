@@ -1,0 +1,9 @@
+{
+  "name": "noyer-lin-residence",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 8765",
+    "start": "python3 -m http.server 8765"
+  }
+}

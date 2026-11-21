@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noyer &amp; Lin Residence</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&family=Noto+Sans+Armenian:wght@400;500;600&family=Noto+Serif+Armenian:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: quiet luxury furniture house, unhurried
+   IDEA: the page is a film you scrub with your scroll: tower at dusk, through the window, into the home
+   PICTURE: full-screen frames of the video, drawn to a canvas, scroll sets the frame
+   COLOUR and TYPE: dusk indigo and warm oak/linen, cream text; Cormorant Garamond + Inter
+   LAYOUT: one sticky stage, captions bottom-left, product panel right (sheet at the bottom on phones) */
+:root{color-scheme:dark;--ink:#f6f1ea;--mute:#d3cde0;--panel:rgba(16,14,36,.88);--line:rgba(255,255,255,.16);--acc:#e8c48e}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:#141433;color:var(--ink);font:16px/1.55 Inter,"Noto Sans Armenian",system-ui,sans-serif;overflow-x:clip}
+#track{height:1400vh;position:relative}
+#stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#141433}
+canvas,video{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:50% 50%}
+@media(max-width:700px){video{object-position:42% 50%}}
+#shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,8,30,.45),transparent 22%,transparent 55%,rgba(10,8,30,.6));pointer-events:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:22px;padding:14px max(3vw,16px)}
+.brand{font:600 22px/1 "Cormorant Garamond","Noto Serif Armenian",serif;letter-spacing:.04em;margin-right:auto;white-space:nowrap}
+.brand small{display:block;font:500 11px/1.4 Inter,"Noto Sans Armenian",sans-serif;color:var(--mute);letter-spacing:0}
+nav a{color:var(--ink);text-decoration:none;font-size:14px;opacity:.9;min-height:44px;display:inline-flex;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:999px;border:1px solid var(--acc);background:var(--acc);color:#1b1630;font:600 14px Inter,sans-serif;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:focus-visible,a:focus-visible,#bar:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.cap{position:absolute;left:max(4vw,20px);bottom:13vh;max-width:520px;opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s;pointer-events:none;text-shadow:0 2px 20px rgba(10,8,30,.6)}
+.cap.on{opacity:1;transform:none;pointer-events:auto}
+.kick{font-size:13px;color:var(--acc);margin:0 0 6px}
+h1,h2{font-family:"Cormorant Garamond","Noto Serif Armenian",serif;font-weight:500;line-height:1.1;margin:0 0 12px;text-wrap:balance}
+h1{font-size:clamp(34px,5vw,62px)}
+h2{font-size:clamp(28px,3.6vw,46px)}
+.lead{font-size:17px;color:var(--mute);max-width:46ch;margin:0 0 18px}
+.panel{position:absolute;right:max(2.5vw,16px);top:84px;width:340px;max-height:calc(100% - 120px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 18px 8px;opacity:0;transform:translateX(18px);transition:opacity .5s,transform .5s;pointer-events:none}
+.panel.on{opacity:1;transform:none;pointer-events:auto}
+.panel h3{margin:0 0 4px;font:600 15px Inter,sans-serif}
+.panel p{margin:0 0 10px;font-size:14px;color:var(--mute)}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:11px 0;border-top:1px solid var(--line)}
+.item b{font-weight:500;font-size:15px}
+.item span{font-size:13px;color:var(--mute)}
+.item i{font-style:normal;font-size:15px;grid-row:1/3;grid-column:2;align-self:center;white-space:nowrap}
+#bar{position:fixed;right:14px;top:50%;transform:translateY(-50%);width:3px;height:120px;background:var(--line);border-radius:2px;z-index:6}
+#bar i{display:block;width:100%;background:#fff;border-radius:2px;height:0}
+#load{position:absolute;inset:0;display:grid;place-items:center;background:#141433;z-index:8;transition:opacity .6s}
+#load.done{opacity:0;pointer-events:none}
+#load div{width:min(240px,60vw);text-align:center;font-size:13px;color:var(--mute)}
+#load u{display:block;height:2px;background:var(--line);margin-top:10px;text-decoration:none}
+#load u b{display:block;height:100%;width:0;background:var(--acc)}
+#floors{position:absolute;right:max(14px,3vw);top:50%;transform:translate(16px,-50%);z-index:7;display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:20px;background:rgba(16,14,36,.88);border:1px solid var(--line);opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;max-height:82vh;overflow-y:auto;scrollbar-width:none}
+#floors::-webkit-scrollbar{display:none}
+#floors.on{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+#floors h4{margin:2px 6px 2px;font:600 11px Inter,"Noto Sans Armenian",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+#floors button{min-height:36px;min-width:104px;padding:0 13px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);font:500 13px Inter,"Noto Sans Armenian",sans-serif;cursor:pointer;text-align:left}
+#floors button.on{background:var(--acc);color:#1b1630;border-color:var(--acc)}
+#floors button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#fband{position:absolute;z-index:6;opacity:0;pointer-events:none;transition:opacity .4s}#fband svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 10px rgba(255,200,120,.6))}#fband polygon{fill:rgba(255,214,150,.22);stroke:var(--acc);stroke-width:2;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+#fband.on{opacity:1}
+#fband span{position:absolute;left:69.4%;top:50%;transform:translateY(-50%);padding:5px 10px;border-radius:999px;background:rgba(16,14,36,.9);border:1px solid var(--line);font:600 13px Inter,"Noto Sans Armenian",sans-serif;white-space:nowrap;color:var(--ink)}
+#floors .go{margin-top:4px;background:var(--acc);color:#1b1630;border-color:var(--acc);font-weight:600}
+#fb{position:absolute;left:max(14px,3vw);top:76px;z-index:7;padding:6px 12px;border-radius:999px;background:rgba(16,14,36,.88);border:1px solid var(--line);font:500 13px Inter,"Noto Sans Armenian",sans-serif;color:var(--ink);opacity:0;transition:opacity .4s;pointer-events:none}
+#fb.on{opacity:1}
+#orb{position:absolute;left:50%;top:80px;transform:translateX(-50%);z-index:7;display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:rgba(16,14,36,.86);border:1px solid var(--line);font:500 13px Inter,"Noto Sans Armenian",sans-serif;color:var(--ink);opacity:0;transition:opacity .4s;user-select:none}
+#orb.on{opacity:1;pointer-events:auto}
+#orb b{color:var(--acc);font-weight:600}
+#orb button{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);font-size:12px;cursor:pointer;display:inline-grid;place-items:center;padding:0}
+#orb button:hover{border-color:var(--acc);color:var(--acc)}
+#stage.grab{cursor:grab}#stage.grab.down{cursor:grabbing}
+@media(max-width:700px){#floors{right:8px;padding:5px;gap:3px;max-height:74vh}#floors button{min-width:80px;min-height:30px;padding:0 9px;font-size:12px}#fb{display:none}#fband span{display:none}}
+#tabs{position:absolute;left:50%;bottom:2.4vh;transform:translate(-50%,16px);z-index:7;display:flex;gap:6px;padding:6px;border-radius:999px;background:rgba(16,14,36,.88);border:1px solid var(--line);opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;max-width:94vw;overflow-x:auto;scrollbar-width:none}
+#tabs.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#tabs::-webkit-scrollbar{display:none}
+#tabs button{flex:none;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:transparent;color:var(--ink);font:500 14px Inter,"Noto Sans Armenian",sans-serif;cursor:pointer;white-space:nowrap}
+#tabs button.on{background:var(--acc);color:#1b1630}
+#tabs button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+.note{font-size:13px;color:var(--mute);margin:12px 0 0}
+dialog{border:1px solid var(--line);border-radius:18px;background:#1d1a3f;color:var(--ink);width:min(420px,92vw);padding:24px}
+dialog::backdrop{background:rgba(5,5,20,.6)}
+label{display:block;font-size:14px;margin:12px 0 4px;color:var(--mute)}
+input,select{width:100%;min-height:44px;font:16px Inter,sans-serif;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:#2a2656;color:var(--ink)}
+@media(max-width:700px){
+  nav a{display:none}
+  .brand small{display:none}
+  nav{gap:10px}
+  .brand{font-size:19px}
+  .cap{bottom:84px;right:20px}
+  #tabs{bottom:10px}
+  .cap.pn{bottom:auto;top:70px;right:16px;left:16px}
+  .cap.pn .lead{display:none}
+  .cap.pn .btn{display:none}
+  h1{font-size:32px}
+  .panel{left:12px;right:12px;width:auto;top:auto;bottom:74px;max-height:34vh;padding:14px 16px 4px}
+  #bar{display:none}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">Noyer &amp; Lin<small>Furniture for the whole home</small></div>
+  <a href="#" data-p="0">Residence</a><a href="#" data-p=".28">Living room</a><a href="#" data-p=".48">Kitchen</a><a href="#" data-p=".72">Bedroom</a>
+  <button class="btn ghost" id="lg" aria-label="Language">EN</button><button class="btn" data-book>Book a visit</button>
+</nav>
+
+<div id="track">
+ <div id="stage">
+  <canvas id="cm"></canvas>
+  <video id="cv" muted playsinline preload="none" disablepictureinpicture style="display:none" aria-label="Film: tower at dusk, through a window, into a furnished home"></video>
+  <video id="cv2" muted playsinline preload="none" disablepictureinpicture aria-hidden="true" style="display:none;opacity:0"></video>
+  <div id="shade"></div>
+  <div class="cap on" data-a="0" data-b=".06">
+    <p class="kick" id="k1">The Residence · Floor 7</p>
+    <h1>Walk through a home we furnished</h1>
+    <p class="lead">Every piece you see is from our collection. Scroll to step inside.</p>
+    <button class="btn" data-p=".24">Go to the living room</button>
+  </div>
+  <div class="cap" data-a=".07" data-b=".14">
+    <p class="kick" id="k2">Floor 7</p><h2>One window. One home.</h2>
+    <p class="lead">Designed and made in our workshop, delivered and placed in a single day.</p>
+  </div>
+  <div class="cap" data-a=".15" data-b=".21">
+    <p class="kick">The plan</p><h2>128 m², furnished end to end</h2>
+  </div>
+  <div class="cap pn" data-a="0.22" data-b="0.41"><p class="kick">Living room · 4 pieces</p><h2>Soft, low and made to stay</h2><p class="lead">A deep bouclé sofa facing a linear fire, chairs turned to the view.</p></div>
+  <aside class="panel" data-a="0.23" data-b="0.41"><h3>In this room</h3><p>Tap a piece to ask about it at the showroom.</p><div class="item"><b>Dune modular sofa</b><span>Bouclé, 320 cm</span><i>$6,400</i></div><div class="item"><b>Orbit lounge chair ×2</b><span>Solid oak, wool</span><i>$1,850</i></div><div class="item"><b>Strata coffee table</b><span>Travertine</span><i>$2,100</i></div><div class="item"><b>Field rug</b><span>Wool, 300×300</span><i>$2,900</i></div></aside>
+  <div class="cap pn" data-a="0.42" data-b="0.525"><p class="kick">Kitchen · 4 pieces</p><h2>Walnut, stone and brass</h2><p class="lead">Fluted walnut fronts, a marble island and room for everyone.</p></div>
+  <aside class="panel" data-a="0.425" data-b="0.525"><h3>In this room</h3><p>Tap a piece to ask about it at the showroom.</p><div class="item"><b>Fluted kitchen</b><span>Walnut, marble tops</span><i>from $18,900</i></div><div class="item"><b>Marble island</b><span>Book-matched marble</span><i>$7,400</i></div><div class="item"><b>Arc counter stool ×4</b><span>Oak, saddle leather</span><i>$690</i></div><div class="item"><b>Brass range hood</b><span>Brass, 90 cm</span><i>$1,350</i></div></aside>
+  <div class="cap pn" data-a="0.535" data-b="0.625"><p class="kick">Dining · 3 pieces</p><h2>Room for eight</h2><p class="lead">A long oak table under a paper moon, made for slow evenings.</p></div>
+  <aside class="panel" data-a="0.54" data-b="0.625"><h3>In this room</h3><p>Tap a piece to ask about it at the showroom.</p><div class="item"><b>Long table 240</b><span>Solid oak, 8 seats</span><i>$4,300</i></div><div class="item"><b>Curve dining chair ×8</b><span>Walnut</span><i>$780</i></div><div class="item"><b>Moon pendant</b><span>Paper, 90 cm</span><i>$460</i></div></aside>
+  <div class="cap pn" data-a="0.64" data-b="0.82"><p class="kick">Bedroom · 4 pieces</p><h2>Quiet by design</h2><p class="lead">Soft linen, a tall padded headboard and a door to the sea air.</p></div>
+  <aside class="panel" data-a="0.65" data-b="0.82"><h3>In this room</h3><p>Tap a piece to ask about it at the showroom.</p><div class="item"><b>Nest bed 180</b><span>Washed linen</span><i>$3,900</i></div><div class="item"><b>Float nightstand ×2</b><span>Walnut</span><i>$620</i></div><div class="item"><b>Halo table lamp ×2</b><span>Linen shade, brass</span><i>$540</i></div><div class="item"><b>Veil curtains</b><span>Linen, 2 panels</span><i>$480</i></div></aside>
+  <div class="cap pn" data-a="0.84" data-b="1.01"><p class="kick">Terrace · 3 pieces</p><h2>Evenings outside</h2><p class="lead">Low loungers, a stone table and the last light over the water.</p><button class="btn" data-book>Book a showroom visit</button><p class="note">Sample site: brand, pieces and prices are invented.</p></div>
+  <aside class="panel" data-a="0.85" data-b="1.01"><h3>In this room</h3><p>Tap a piece to ask about it at the showroom.</p><div class="item"><b>Dune lounger ×2</b><span>Teak, linen</span><i>$1,200</i></div><div class="item"><b>Stone side table</b><span>Travertine</span><i>$380</i></div><div class="item"><b>Olive tree</b><span>In stone planter</span><i>$290</i></div></aside>
+  <div id="floors" role="navigation" aria-label="Floors"><h4>Floors</h4><button data-f="Rooftop">Rooftop</button><button data-f="Penthouse">Penthouse</button><button data-f="Floor 8">Floor 8</button><button data-f="Floor 7" class="on">Floor 7</button><button data-f="Floor 6">Floor 6</button><button data-f="Floor 5">Floor 5</button><button data-f="Floor 4">Floor 4</button><button data-f="Floor 3">Floor 3</button><button data-f="Floor 2">Floor 2</button><button data-f="Floor 1">Floor 1</button><button class="go" data-p=".24">Enter floor</button></div>
+  <div id="fband"><svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><polygon points=""/></svg><span>Floor 7</span></div>
+  <div id="fb">Floor 7</div>
+  <div id="orb" class="on"><button type="button" id="ol" aria-label="Rotate left">◀</button><b>⟲ 360°</b> <span>Drag to rotate building</span> · <i id="deg" style="font-style:normal;color:var(--acc)">0°</i><button type="button" id="or" aria-label="Rotate right">▶</button></div>
+  <div id="tabs" role="navigation" aria-label="Rooms"><button data-p=".26" data-r="0">Living room</button><button data-p=".46" data-r="1">Kitchen</button><button data-p=".57" data-r="2">Dining</button><button data-p=".72" data-r="3">Bedroom</button><button data-p=".90" data-r="4">Terrace</button></div>
+  <div id="load"><div>Loading the film<u><b id="lb"></b></u></div></div>
+ </div>
+</div>
+<div id="bar" aria-hidden="true"><i id="bi"></i></div>
+
+<dialog id="dlg">
+  <form id="f">
+    <h2 style="font-size:32px">Book a visit</h2>
+    <label for="n">Name</label><input id="n" required autocomplete="name">
+    <label for="ph">Phone</label><input id="ph" required type="tel" autocomplete="tel">
+    <label for="dy">Preferred day</label><select id="dy"><option>Weekday</option><option>Saturday</option><option>Sunday</option></select>
+    <p id="ok" class="note" hidden>Thank you. This is a demo, so nothing was sent.</p>
+    <div style="display:flex;gap:10px;margin-top:18px"><button class="btn" type="submit">Request visit</button><button class="btn ghost" type="button" id="cl">Close</button></div>
+  </form>
+</dialog>
+
+<script>
+{
+const v=document.getElementById('cv'),track=document.getElementById('track'),caps=[...document.querySelectorAll('[data-a]')];
+let pos=0,ready=false;
+const hide=()=>{if(!ready){ready=true;document.getElementById('load').classList.add('done')}};
+const M=matchMedia('(pointer:coarse)').matches||innerWidth<700,N=338,DIR=M?'m/':'d/',cm=document.getElementById('cm'),cx=cm.getContext('2d'),imgs=[],oimgs=[];
+let loaded=0,last=-1,ON=0,oready=false,ang=0,tAng=0,drag=false,dx0=0,a0=0;
+fetch('o/meta.json').then(r=>r.ok?r.json():null).then(m=>{if(!m||!m.count)return;ON=m.count;const sub=M?'o/m/':'o/d/';let n=0;for(let i=0;i<ON;i++){const im=new Image();im.onload=im.onerror=()=>{if(++n>=ON){oready=true;last=-1}};im.src=sub+String(i+1).padStart(3,'0')+'.jpg';oimgs[i]=im}}).catch(()=>{});
+const XF=(r,w)=>{const x=Math.min(1,Math.max(0,r/w));return x*x*(3-2*x)};/* smooth crossfade floor clip -> main film */
+function ok(k){const m=imgs[k];return m&&m.complete&&m.naturalWidth}
+function drawI(f){let k=Math.floor(f),fr=f-k;const aKey=Math.round(ang*10),key=Math.round(f*24)+(fready?1e6:0)+aKey*1e4;if(key===last)return;
+  while(k>0&&!ok(k))k--;if(!ok(k))return;const d=Math.min(devicePixelRatio||1,2),W=cm.clientWidth,H=cm.clientHeight;
+  if(cm.width!==W*d||cm.height!==H*d){cm.width=W*d;cm.height=H*d}cx.setTransform(d,0,0,d,0,0);
+  const put=(im,al,zm=1,tx=.535,ty=.45)=>{const s=Math.max(W/im.naturalWidth,H/im.naturalHeight)*zm,w=im.naturalWidth*s,h=im.naturalHeight*s,ox=Math.min(0,Math.max(W-w,W*.5-w*tx)),oy=Math.min(0,Math.max(H-h,H*.5-h*ty));cx.globalAlpha=al;cx.drawImage(im,ox,oy,w,h)};
+  if(fready&&fimgs&&f<FN-1&&Math.abs(ang)<1){
+    put(imgs[k],1);if(fr>.03&&ok(k+1))put(imgs[k+1],fr);
+    const al=XF(FN-1-f,30),j=Math.floor(f),g=f-j,a=fimgs[j],b=fimgs[j+1],okf=m=>m&&m.complete&&m.naturalWidth;
+    if(okf(a)){put(a,al);if(g>.03&&okf(b))put(b,al*g)}
+  }else if(f<68){
+    const na=((ang%360)+360)%360,p=na<=180?na/180:(360-na)/180,ok0=oready&&ON>0?Math.min(ON-1,Math.floor(p*(ON-1))):0,base=(oready&&ON>0&&oimgs[ok0]&&oimgs[ok0].complete&&oimgs[ok0].naturalWidth)?oimgs[ok0]:imgs[0];
+    const t=Math.min(1,f/56),e=t*t*(3-2*t),zm=1+e*2.35,ty=.48+(FP[cur]-.48)*e,tx=M?.5:(.5+.035*e);
+    if(base&&base.complete&&base.naturalWidth)put(base,1,zm,tx,ty);
+    if(f>52){const b=XF(f-52,16),jk=Math.max(68,k);if(ok(jk))put(imgs[jk],b)}
+  }else{
+    put(imgs[k],1);if(fr>.03&&ok(k+1))put(imgs[k+1],fr);
+  }
+  cx.globalAlpha=1;last=key}
+setTimeout(hide,9000);
+for(let i=0;i<N;i++){const im=new Image();im.onload=im.onerror=()=>{loaded++;document.getElementById('lb').style.width=(loaded/N*100)+'%';if(loaded>=45){hide();last=-1}};im.src=DIR+String(i+1).padStart(3,'0')+'.jpg';imgs[i]=im}
+const fbn=document.getElementById('fband'),FP={'Rooftop':.12,'Penthouse':.24,'Floor 8':.35,'Floor 7':.46,'Floor 6':.57,'Floor 5':.69,'Floor 4':.79,'Floor 3':.87,'Floor 2':.93,'Floor 1':.97};let cur='Floor 7';
+const SL=[[[577,241],[876,129],[1280,193]],[[587,327],[876,277],[1280,313]],[[595,414],[876,396],[1280,411]],[[604,499],[876,541],[1280,518]],[[613,589],[876,668],[1280,618]],[[622,672],[876,803],[1280,715]],[[630,747],[876,900],[1280,805]],[[638,818],[876,985],[1280,885]],[[645,882],[876,1060],[1280,960]],[[652,940],[876,1130],[1280,1030]]],FI={'Penthouse':0,'Floor 8':1,'Floor 7':2,'Floor 6':3,'Floor 5':4,'Floor 4':5,'Floor 3':6,'Floor 2':7,'Floor 1':8};
+function fpoly(f){if(f==='Rooftop')return[[758,108],[952,65],[1188,116],[1188,175],[876,129],[758,158]];const a=SL[FI[f]],b=SL[FI[f]+1];return[...a,...b.slice().reverse()]}
+function band(){const W=innerWidth,H=innerHeight,sw=M?506:1600,sh=900,xo=M?547:0,s=Math.max(W/sw,H/sh),rad=ang*Math.PI/180,shx=oready?0:Math.sin(rad)*W*.14,ox=(W-sw*s)/2+shx,oy=(H-sh*s)/2,pts=fpoly(cur);fbn.style.left=(ox-xo*s)+'px';fbn.style.top=oy+'px';fbn.style.width=(1600*s)+'px';fbn.style.height=(sh*s)+'px';fbn.style.transform=`perspective(1200px) rotateY(${(!oready?Math.sin(rad)*18:0).toFixed(2)}deg)`;fbn.querySelector('polygon').setAttribute('points',pts.map(q=>q.join(',')).join(' '));const ys=pts.map(q=>q[1]),sp=fbn.querySelector('span');sp.style.top=Math.min(92,(Math.min(...ys)+Math.max(...ys))/2/9)+'%';const tn=sp.firstChild;tn.nodeValue=cur;orig.delete(tn);if(typeof walk==='function')walk()}
+const FV={'Rooftop':['rooftop',98],'Penthouse':['penthouse',100]};let fimgs=null,fready=false,FN=100;
+function loadFloor(){fready=false;fimgs=null;const ent=FV[cur];if(!ent)return;const[k,cnt]=ent;FN=cnt;const go=document.querySelector('#floors .go');go.disabled=true;go.style.opacity=.6;const done=()=>{if(!FV[cur]||FV[cur][0]!==k)return;fready=true;last=-1;go.disabled=false;go.style.opacity=''};
+ const sub=M?('f/'+k+'/'):('f/'+k+'_d/'),a=[];let n=0;for(let i=0;i<FN;i++){const im=new Image();im.onload=im.onerror=()=>{if(++n>=FN)done()};im.src=sub+String(i+1).padStart(3,'0')+'.jpg';a[i]=im}fimgs=a}
+const fl=document.getElementById('floors'),fbd=document.getElementById('fb'),orb=document.getElementById('orb'),degEl=document.getElementById('deg'),stg=document.getElementById('stage'),tabs=document.getElementById('tabs'),tb=[...tabs.children];
+stg.addEventListener('pointerdown',e=>{if(pos>.08||e.target.closest('button,a,aside,dialog,#floors,#tabs'))return;drag=true;dx0=e.clientX;a0=tAng;stg.classList.add('down');try{stg.setPointerCapture(e.pointerId)}catch(_){}});
+addEventListener('pointermove',e=>{if(!drag)return;tAng=a0+(e.clientX-dx0)*.95});
+addEventListener('pointerup',()=>{drag=false;stg.classList.remove('down')});
+document.getElementById('ol').onclick=()=>tAng-=45;
+document.getElementById('or').onclick=()=>tAng+=45;
+function tick(){
+  const max=track.offsetHeight-innerHeight,p=max>0?Math.min(1,Math.max(0,scrollY/max)):0;
+  pos+=(p-pos)*.14;if(Math.abs(p-pos)<.0002)pos=p;
+  if(tAng!==ang){ang=tAng;degEl.textContent=((Math.round(ang)%360+360)%360)+'°';last=-1;band()}
+  drawI(Math.min(N-1.001,pos*(N-1)));
+  document.getElementById('bi').style.height=(p*100)+'%';
+  const R=[.22,.42,.535,.64,.84];let ar=-1;R.forEach((x,i)=>{if(p>=x)ar=i});if(p>1)ar=4;
+  tabs.classList.toggle('on',p>=.21);fl.classList.toggle('on',p<=.05);fbn.classList.toggle('on',p<=.035&&(!oready||Math.abs(((ang%360)+360)%360)<18||Math.abs(((ang%360)+360)%360)>342));orb.classList.toggle('on',p<=.05);stg.classList.toggle('grab',p<=.06);fbd.classList.toggle('on',p>=.21);tb.forEach((b,i)=>b.classList.toggle('on',i===ar));
+  caps.forEach(c=>c.classList.toggle('on',p>=+c.dataset.a&&p<=+c.dataset.b));
+  requestAnimationFrame(tick);
+}
+function size(){}
+addEventListener('resize',size);size();tick();
+const HY={"Drag to rotate building":"Քաշեք՝ շենքը պտտելու համար","The Residence · Rooftop":"Բնակարանը · Տանիք","The Residence · Penthouse":"Բնակարանը · Պենթհաուս","The Residence · Floor 8":"Բնակարանը · 8-րդ հարկ","The Residence · Floor 7":"Բնակարանը · 7-րդ հարկ","The Residence · Floor 6":"Բնակարանը · 6-րդ հարկ","The Residence · Floor 5":"Բնակարանը · 5-րդ հարկ","The Residence · Floor 4":"Բնակարանը · 4-րդ հարկ","The Residence · Floor 3":"Բնակարանը · 3-րդ հարկ","The Residence · Floor 2":"Բնակարանը · 2-րդ հարկ","The Residence · Floor 1":"Բնակարանը · 1-ին հարկ","Enter floor":"Մտնել հարկ","Floors":"Հարկեր","Rooftop":"Տանիք","Penthouse":"Պենթհաուս","Floor 8":"8-րդ հարկ","Floor 7":"7-րդ հարկ","Floor 6":"6-րդ հարկ","Floor 5":"5-րդ հարկ","Floor 4":"4-րդ հարկ","Floor 3":"3-րդ հարկ","Floor 2":"2-րդ հարկ","Floor 1":"1-ին հարկ","Dining": "Ճաշասենյակ", "Terrace": "Պատշգամբ","Bedroom": "Ննջասենյակ", "Bedroom · 4 pieces": "Ննջասենյակ · 4 իր", "Quiet by design": "Հանգիստ՝ ըստ նախագծի", "Soft linen, a tall padded headboard and a door to the sea air.": "Փափուկ կտավ, բարձր գլխատակ և դուռ դեպի ծովի օդը։", "Nest bed 180": "Nest մահճակալ 180", "Washed linen": "Լվացված կտավ", "Float nightstand ×2": "Float գիշերանոթ ×2", "Halo table lamp ×2": "Halo սեղանի լամպ ×2", "Linen shade, brass": "Կտավե կափարիչ, արույր", "Veil curtains": "Veil վարագույրներ", "Linen, 2 panels": "Կտավ, 2 կտոր", "Terrace · 3 pieces": "Պատշգամբ · 3 իր", "Evenings outside": "Երեկոներ դրսում", "Low loungers, a stone table and the last light over the water.": "Ցածր պառկարաններ, քարե սեղան և ջրի վրա վերջին լույսը։", "Dune lounger ×2": "Dune պառկարան ×2", "Teak, linen": "Տեքի, կտավ", "Stone side table": "Քարե սեղանիկ", "Olive tree": "Ձիթենի", "In stone planter": "Քարե թաղարում","Kitchen": "Խոհանոց", "Kitchen · 4 pieces": "Խոհանոց · 4 իր", "Walnut, stone and brass": "Ընկույզ, քար և արույր", "Fluted walnut fronts, a marble island and room for everyone.": "Ակոսավոր ընկույզե ճակատներ, մարմարե կղզի և տեղ բոլորի համար։", "Fluted kitchen": "Ակոսավոր խոհանոց", "Walnut, marble tops": "Ընկույզ, մարմարե մակերես", "Marble island": "Մարմարե կղզի", "Book-matched marble": "Բնական մարմար", "Arc counter stool ×4": "Arc բարձր աթոռ ×4", "Oak, saddle leather": "Կաղնի, կաշի", "Brass range hood": "Արույրե օդաքաշ", "Brass, 90 cm": "Արույր, 90 սմ", "Dining · 3 pieces": "Ճաշասենյակ · 3 իր", "Room for eight": "Տեղ ութ հոգու համար", "A long oak table under a paper moon, made for slow evenings.": "Երկար կաղնե սեղան թղթե լուսնի տակ՝ դանդաղ երեկոների համար։", "Curve dining chair ×8": "Curve ճաշի աթոռ ×8", "Walnut": "Ընկույզ","Furniture for the whole home": "Կահույք ամբողջ տան համար", "Residence": "Բնակարան", "Living room": "Հյուրասենյակ", "Book a visit": "Այց ամրագրել", "The Residence · Floor 7": "Բնակարանը · 7-րդ հարկ", "Walk through a home we furnished": "Մտեք մեր կահավորած տուն", "Every piece you see is from our collection. Scroll to step inside.": "Ամեն իր, որ տեսնում եք, մեր հավաքածուից է։ Scroll արեք՝ ներս մտնելու համար։", "Go to the living room": "Անցնել հյուրասենյակ", "Floor 7": "7-րդ հարկ", "One window. One home.": "Մեկ պատուհան։ Մեկ տուն։", "Designed and made in our workshop, delivered and placed in a single day.": "Նախագծված և պատրաստված մեր արհեստանոցում, առաքվում և տեղադրվում է մեկ օրում։", "The plan": "Նախագիծ", "128 m², furnished end to end": "128 մ², կահավորված ամբողջությամբ", "Living room · 6 pieces": "Հյուրասենյակ · 6 իր", "Soft, low and made to stay": "Փափուկ, ցածր և երկար տարիների համար", "A deep bouclé sofa facing a linear fire, chairs turned to the view.": "Խոր բուկլե բազմոց՝ բուխարու դիմաց, աթոռները՝ դեպի տեսարանը։", "Book a showroom visit": "Այց սրահ", "Sample site: brand, pieces and prices are invented.": "Նմուշ կայք. ապրանքանիշը, իրերը և գները հորինված են։", "In this room": "Այս սենյակում", "Tap a piece to ask about it at the showroom.": "Հարցրեք ցանկացած իրի մասին սրահում։", "Dune modular sofa": "Dune մոդուլային բազմոց", "Bouclé, 320 cm": "Բուկլե, 320 սմ", "Orbit lounge chair ×2": "Orbit բազկաթոռ ×2", "Solid oak, wool": "Կաղնի, բուրդ", "Strata coffee table": "Strata սուրճի սեղան", "Travertine": "Տրավերտին", "Long table 240": "Երկար սեղան 240", "Solid oak, 8 seats": "Կաղնի, 8 տեղ", "Moon pendant": "Moon առաստաղի լամպ", "Paper, 90 cm": "Թուղթ, 90 սմ", "Field rug": "Field գորգ", "Wool, 300×300": "Բուրդ, 300×300", "Loading the film": "Բեռնվում է", "Name": "Անուն", "Phone": "Հեռախոս", "Preferred day": "Հարմար օր", "Weekday": "Աշխատանքային օր", "Saturday": "Շաբաթ", "Sunday": "Կիրակի", "Request visit": "Ուղարկել", "Close": "Փակել", "Thank you. This is a demo, so nothing was sent.": "Շնորհակալություն։ Սա դեմո է, ոչինչ չի ուղարկվել։"};let lang='hy';const orig=new Map();
+function walk(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){const t=n.nodeValue.trim();if(!t)continue;if(!orig.has(n)){if(HY[t])orig.set(n,[n.nodeValue,t]);else continue}const[o,k]=orig.get(n);n.nodeValue=lang==='hy'?o.replace(k,HY[k]):o}}
+const lg=document.getElementById('lg');lg.onclick=()=>{lang=lang==='hy'?'en':'hy';lg.textContent=lang==='hy'?'EN':'HY';document.documentElement.lang=lang==='hy'?'hy':'en';walk()};
+walk();
+
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.getElementById('floors').addEventListener('click',e=>{const b=e.target.closest('button[data-f]');if(!b)return;
+  [...fl.querySelectorAll('button')].forEach(x=>x.classList.toggle('on',x===b));cur=b.dataset.f;loadFloor();last=-1;for(const[id,pre]of[['k1','The Residence · '],['k2','']]){const e=document.getElementById(id).firstChild;e.nodeValue=pre+cur;orig.delete(e)}fbd.firstChild.nodeValue=cur;orig.delete(fbd.firstChild);band()});addEventListener('resize',band);band();
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-p]');
+  if(g){e.preventDefault();const max=track.offsetHeight-innerHeight;scrollTo({top:+g.dataset.p*max,behavior:reduce?'auto':'smooth'})}
+  if(e.target.closest('[data-book]')){document.getElementById('ok').hidden=true;try{document.getElementById('dlg').showModal()}catch(_){}}
+});
+document.getElementById('cl').onclick=()=>document.getElementById('dlg').close();
+document.getElementById('f').addEventListener('submit',e=>{e.preventDefault();document.getElementById('ok').hidden=false});
+}
+</script>
+</body>
+</html>
