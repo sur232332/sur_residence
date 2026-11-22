@@ -158,8 +158,8 @@ const v=document.getElementById('cv'),track=document.getElementById('track'),cap
 let pos=0,ready=false;
 const hide=()=>{if(!ready){ready=true;document.getElementById('load').classList.add('done')}};
 const M=matchMedia('(pointer:coarse)').matches||innerWidth<700,N=338,DIR=M?'m/':'d/',cm=document.getElementById('cm'),cx=cm.getContext('2d'),imgs=[],oimgs=[];
-let loaded=0,last=-1,ON=0,oready=false,ang=0,tAng=0,drag=false,dx0=0,a0=0;
-fetch('o/meta.json').then(r=>r.ok?r.json():null).then(m=>{if(!m||!m.count)return;ON=m.count;const sub=M?'o/m/':'o/d/';let n=0;for(let i=0;i<ON;i++){const im=new Image();im.onload=im.onerror=()=>{if(++n>=ON){oready=true;last=-1}};im.src=sub+String(i+1).padStart(3,'0')+'.jpg';oimgs[i]=im}}).catch(()=>{});
+let loaded=0,last=-1,ON=0,OC=0,oready=false,ang=0,tAng=0,drag=false,dx0=0,a0=0;
+fetch('o/meta.json').then(r=>r.ok?r.json():null).then(m=>{if(!m||!m.count)return;ON=m.count;OC=m.center||0;const sub=M?'o/m/':'o/d/';let n=0;for(let i=0;i<ON;i++){const im=new Image();im.onload=im.onerror=()=>{if(++n>=ON){oready=true;last=-1}};im.src=sub+String(i+1).padStart(3,'0')+'.jpg';oimgs[i]=im}}).catch(()=>{});
 const XF=(r,w)=>{const x=Math.min(1,Math.max(0,r/w));return x*x*(3-2*x)};/* smooth crossfade floor clip -> main film */
 function ok(k){const m=imgs[k];return m&&m.complete&&m.naturalWidth}
 function drawI(f){let k=Math.floor(f),fr=f-k;const aKey=Math.round(ang*10),key=Math.round(f*24)+(fready?1e6:0)+aKey*1e4;if(key===last)return;
@@ -171,7 +171,7 @@ function drawI(f){let k=Math.floor(f),fr=f-k;const aKey=Math.round(ang*10),key=M
     const al=XF(FN-1-f,30),j=Math.floor(f),g=f-j,a=fimgs[j],b=fimgs[j+1],okf=m=>m&&m.complete&&m.naturalWidth;
     if(okf(a)){put(a,al);if(g>.03&&okf(b))put(b,al*g)}
   }else if(f<68){
-    const na=((ang%360)+360)%360,p=na<=180?na/180:(360-na)/180,ok0=oready&&ON>0?Math.min(ON-1,Math.floor(p*(ON-1))):0,base=(oready&&ON>0&&oimgs[ok0]&&oimgs[ok0].complete&&oimgs[ok0].naturalWidth)?oimgs[ok0]:imgs[0];
+    const ca=Math.max(-90,Math.min(90,ang)),ok0=oready&&ON>0?Math.max(0,Math.min(ON-1,Math.round(OC+(ca/90)*OC))):0,base=(oready&&ON>0&&Math.abs(ang)>.5&&oimgs[ok0]&&oimgs[ok0].complete&&oimgs[ok0].naturalWidth)?oimgs[ok0]:imgs[0];
     const t=Math.min(1,f/56),e=t*t*(3-2*t),zm=1+e*2.45,ty=.45+(FP[cur]-.45)*e,tx=.505;
     if(base&&base.complete&&base.naturalWidth)put(base,1,zm,tx,ty);
     if(f>52){const b=XF(f-52,16),jk=Math.max(68,k);if(ok(jk))put(imgs[jk],b)}
@@ -190,14 +190,14 @@ function loadFloor(){fready=false;fimgs=null;const ent=FV[cur];if(!ent)return;co
  const sub=M?('f/'+k+'/'):('f/'+k+'_d/'),a=[];let n=0;for(let i=0;i<FN;i++){const im=new Image();im.onload=im.onerror=()=>{if(++n>=FN)done()};im.src=sub+String(i+1).padStart(3,'0')+'.jpg';a[i]=im}fimgs=a}
 const fl=document.getElementById('floors'),fbd=document.getElementById('fb'),orb=document.getElementById('orb'),degEl=document.getElementById('deg'),stg=document.getElementById('stage'),tabs=document.getElementById('tabs'),tb=[...tabs.children];
 stg.addEventListener('pointerdown',e=>{if(pos>.08||e.target.closest('button,a,aside,dialog,#floors,#tabs'))return;drag=true;dx0=e.clientX;a0=tAng;stg.classList.add('down');try{stg.setPointerCapture(e.pointerId)}catch(_){}});
-addEventListener('pointermove',e=>{if(!drag)return;tAng=a0+(e.clientX-dx0)*.95});
+addEventListener('pointermove',e=>{if(!drag)return;tAng=Math.max(-90,Math.min(90,a0+(e.clientX-dx0)*.35))});
 addEventListener('pointerup',()=>{drag=false;stg.classList.remove('down')});
-document.getElementById('ol').onclick=()=>tAng-=45;
-document.getElementById('or').onclick=()=>tAng+=45;
+document.getElementById('ol').onclick=()=>tAng=Math.max(-90,tAng-30);
+document.getElementById('or').onclick=()=>tAng=Math.min(90,tAng+30);
 function tick(){
   const max=track.offsetHeight-innerHeight,p=max>0?Math.min(1,Math.max(0,scrollY/max)):0;
   pos+=(p-pos)*.14;if(Math.abs(p-pos)<.0002)pos=p;
-  if(tAng!==ang){ang=tAng;degEl.textContent=((Math.round(ang)%360+360)%360)+'°';last=-1;band()}
+  if(tAng!==ang){ang=tAng;degEl.textContent=(Math.round(ang)>0?'+':'')+Math.round(ang)+'°';last=-1;band()}
   drawI(Math.min(N-1.001,pos*(N-1)));
   document.getElementById('bi').style.height=(p*100)+'%';
   const R=[.22,.42,.535,.64,.84];let ar=-1;R.forEach((x,i)=>{if(p>=x)ar=i});if(p>1)ar=4;
