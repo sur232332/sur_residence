@@ -184,14 +184,24 @@ for(let i=0;i<N;i++){const im=new Image();im.onload=im.onerror=()=>{loaded++;doc
 const fbn=document.getElementById('fband'),FP={'Rooftop':.11,'Penthouse':.16,'Floor 8':.24,'Floor 7':.32,'Floor 6':.40,'Floor 5':.48,'Floor 4':.56,'Floor 3':.64,'Floor 2':.72,'Floor 1':.81};let cur='Floor 7';
 const FI={'Penthouse':0,'Floor 8':1,'Floor 7':2,'Floor 6':3,'Floor 5':4,'Floor 4':5,'Floor 3':6,'Floor 2':7,'Floor 1':8};
 const SL_L=[[[615,74],[835,78],[945,84]],[[540,156],[835,164],[1085,172]],[[540,244],[835,248],[1085,252]],[[540,332],[835,335],[1085,338]],[[540,420],[835,422],[1085,424]],[[540,506],[835,507],[1085,508]],[[540,592],[835,591],[1085,590]],[[540,676],[835,674],[1085,672]],[[540,756],[835,753],[1085,750]],[[540,836],[835,833],[1085,830]]];
+const SL_LM=[[[470,115],[730,105],[970,96]],[[470,195],[730,192],[970,190]],[[470,272],[730,270],[970,268]],[[470,350],[730,348],[970,346]],[[470,428],[730,428],[970,428]],[[470,506],[730,506],[970,506]],[[470,584],[730,584],[970,584]],[[470,662],[730,662],[970,662]],[[470,740],[730,740],[970,740]],[[470,820],[730,820],[970,820]]];
 const SL_C=[[[582,116],[810,116],[1038,116]],[[582,172],[810,172],[1038,172]],[[582,232],[810,232],[1038,232]],[[582,292],[810,292],[1038,292]],[[582,356],[810,356],[1038,356]],[[582,424],[810,424],[1038,424]],[[582,494],[810,494],[1038,494]],[[582,566],[810,566],[1038,566]],[[582,638],[810,638],[1038,638]],[[582,772],[810,772],[1038,772]]];
+const SL_RM=[[[600,112],[820,108],[1045,104]],[[535,195],[800,192],[1060,190]],[[535,280],[800,278],[1060,276]],[[535,365],[800,362],[1060,360]],[[535,450],[800,446],[1060,442]],[[535,535],[800,530],[1060,526]],[[535,620],[800,615],[1060,610]],[[535,705],[800,700],[1060,695]],[[535,790],[800,785],[1060,780]],[[535,875],[800,870],[1060,865]]];
 const SL_R=[[[700,136],[890,140],[1080,144]],[[615,216],[890,218],[1125,220]],[[615,304],[890,304],[1125,304]],[[615,392],[890,390],[1125,388]],[[615,480],[890,476],[1125,472]],[[615,568],[890,562],[1125,556]],[[615,654],[890,646],[1125,638]],[[615,738],[890,728],[1125,718]],[[615,820],[890,808],[1125,796]],[[615,895],[890,884],[1125,872]]];
-function lerpSL(i){const u=Math.max(-1,Math.min(1,ang/90)),t=Math.abs(u),A=SL_C[i],B=u<0?SL_L[i]:SL_R[i];return A.map((p,j)=>[p[0]+(B[j][0]-p[0])*t,p[1]+(B[j][1]-p[1])*t])}
+function lerpSL(i){
+  const u=Math.max(-1,Math.min(1,ang/90));
+  let A,B,t;
+  if(u<-.35){A=SL_LM[i];B=SL_L[i];t=(Math.abs(u)-.35)/.65}
+  else if(u<0){A=SL_C[i];B=SL_LM[i];t=Math.abs(u)/.35}
+  else if(u<.5){A=SL_C[i];B=SL_RM[i];t=u/.5}
+  else{A=SL_RM[i];B=SL_R[i];t=(u-.5)/.5}
+  return A.map((p,j)=>[p[0]+(B[j][0]-p[0])*t,p[1]+(B[j][1]-p[1])*t])
+}
 function fpoly(f){
-  if(f==='Rooftop'){const b=lerpSL(0),a=b.map(p=>[p[0],p[1]-34]);return[...a,...b.slice().reverse()]}
+  if(f==='Rooftop'){const a=lerpSL(0),b=lerpSL(1);return[...a,...b.slice().reverse()]}
   const i=FI[f],a=lerpSL(i),b=lerpSL(i+1);return[...a,...b.slice().reverse()]
 }
-function band(){const W=innerWidth,H=innerHeight,sw=M?506:1600,sh=900,xo=M?547:0,s=Math.max(W/sw,H/sh),ox=(W-sw*s)/2,oy=(H-sh*s)/2,pts=fpoly(cur);fbn.style.left=(ox-xo*s)+'px';fbn.style.top=oy+'px';fbn.style.width=(1600*s)+'px';fbn.style.height=(sh*s)+'px';fbn.style.transform='';fbn.querySelector('polygon').setAttribute('points',pts.map(q=>q.map(v=>Math.round(v)).join(',')).join(' '));const ys=pts.map(q=>q[1]),xs=pts.map(q=>q[0]),sp=fbn.querySelector('span');sp.style.top=Math.max(12,Math.min(88,(Math.min(...ys)+Math.max(...ys))/2/9))+'%';sp.style.left=(Math.max(...xs)/16+1.2)+'%';const tn=sp.firstChild;tn.nodeValue=cur;orig.delete(tn);if(typeof walk==='function')walk()}
+function band(){const W=innerWidth,H=innerHeight,sw=M?506:1600,sh=900,xo=M?547:0,s=Math.max(W/sw,H/sh),w=sw*s,h=sh*s,ox=Math.min(0,Math.max(W-w,W*.5-w*(M?.5:.505))),oy=Math.min(0,Math.max(H-h,H*.5-h*.45)),pts=fpoly(cur);fbn.style.left=(ox-xo*s)+'px';fbn.style.top=oy+'px';fbn.style.width=(1600*s)+'px';fbn.style.height=(sh*s)+'px';fbn.style.transform='';fbn.querySelector('polygon').setAttribute('points',pts.map(q=>q.map(v=>Math.round(v)).join(',')).join(' '));const ys=pts.map(q=>q[1]),xs=pts.map(q=>q[0]),sp=fbn.querySelector('span');sp.style.top=Math.max(13,Math.min(88,(Math.min(...ys)+Math.max(...ys))/2/9))+'%';sp.style.left=(Math.max(...xs)/16+1.2)+'%';const tn=sp.firstChild;tn.nodeValue=cur;orig.delete(tn);if(typeof walk==='function')walk()}
 const FV={'Rooftop':['rooftop',98]};let fimgs=null,fready=false,FN=100;
 function loadFloor(){fready=false;fimgs=null;const ent=FV[cur];if(!ent)return;const[k,cnt]=ent;FN=cnt;const go=document.querySelector('#floors .go');go.disabled=true;go.style.opacity=.6;const done=()=>{if(!FV[cur]||FV[cur][0]!==k)return;fready=true;last=-1;go.disabled=false;go.style.opacity=''};
  const sub=M?('f/'+k+'/'):('f/'+k+'_d/'),a=[];let n=0;for(let i=0;i<FN;i++){const im=new Image();im.onload=im.onerror=()=>{if(++n>=FN)done()};im.src=sub+String(i+1).padStart(3,'0')+'.jpg';a[i]=im}fimgs=a}
