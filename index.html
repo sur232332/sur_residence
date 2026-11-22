@@ -165,14 +165,14 @@ function ok(k){const m=imgs[k];return m&&m.complete&&m.naturalWidth}
 function drawI(f){let k=Math.floor(f),fr=f-k;const aKey=Math.round(ang*10),key=Math.round(f*24)+(fready?1e6:0)+aKey*1e4;if(key===last)return;
   while(k>0&&!ok(k))k--;if(!ok(k))return;const d=Math.min(devicePixelRatio||1,2),W=cm.clientWidth,H=cm.clientHeight;
   if(cm.width!==W*d||cm.height!==H*d){cm.width=W*d;cm.height=H*d}cx.setTransform(d,0,0,d,0,0);
-  const put=(im,al,zm=1,tx=.535,ty=.45)=>{const s=Math.max(W/im.naturalWidth,H/im.naturalHeight)*zm,w=im.naturalWidth*s,h=im.naturalHeight*s,ox=Math.min(0,Math.max(W-w,W*.5-w*tx)),oy=Math.min(0,Math.max(H-h,H*.5-h*ty));cx.globalAlpha=al;cx.drawImage(im,ox,oy,w,h)};
+  const put=(im,al,zm=1,tx=.505,ty=.45)=>{const s=Math.max(W/im.naturalWidth,H/im.naturalHeight)*zm,w=im.naturalWidth*s,h=im.naturalHeight*s,ox=Math.min(0,Math.max(W-w,W*.5-w*tx)),oy=Math.min(0,Math.max(H-h,H*.5-h*ty));cx.globalAlpha=al;cx.drawImage(im,ox,oy,w,h)};
   if(fready&&fimgs&&f<FN-1&&Math.abs(ang)<1){
     put(imgs[k],1);if(fr>.03&&ok(k+1))put(imgs[k+1],fr);
     const al=XF(FN-1-f,30),j=Math.floor(f),g=f-j,a=fimgs[j],b=fimgs[j+1],okf=m=>m&&m.complete&&m.naturalWidth;
     if(okf(a)){put(a,al);if(g>.03&&okf(b))put(b,al*g)}
   }else if(f<68){
     const na=((ang%360)+360)%360,p=na<=180?na/180:(360-na)/180,ok0=oready&&ON>0?Math.min(ON-1,Math.floor(p*(ON-1))):0,base=(oready&&ON>0&&oimgs[ok0]&&oimgs[ok0].complete&&oimgs[ok0].naturalWidth)?oimgs[ok0]:imgs[0];
-    const t=Math.min(1,f/56),e=t*t*(3-2*t),zm=1+e*2.35,ty=.48+(FP[cur]-.48)*e,tx=M?.5:(.5+.035*e);
+    const t=Math.min(1,f/56),e=t*t*(3-2*t),zm=1+e*2.45,ty=.45+(FP[cur]-.45)*e,tx=.505;
     if(base&&base.complete&&base.naturalWidth)put(base,1,zm,tx,ty);
     if(f>52){const b=XF(f-52,16),jk=Math.max(68,k);if(ok(jk))put(imgs[jk],b)}
   }else{
@@ -181,10 +181,10 @@ function drawI(f){let k=Math.floor(f),fr=f-k;const aKey=Math.round(ang*10),key=M
   cx.globalAlpha=1;last=key}
 setTimeout(hide,9000);
 for(let i=0;i<N;i++){const im=new Image();im.onload=im.onerror=()=>{loaded++;document.getElementById('lb').style.width=(loaded/N*100)+'%';if(loaded>=45){hide();last=-1}};im.src=DIR+String(i+1).padStart(3,'0')+'.jpg';imgs[i]=im}
-const fbn=document.getElementById('fband'),FP={'Rooftop':.12,'Penthouse':.24,'Floor 8':.35,'Floor 7':.46,'Floor 6':.57,'Floor 5':.69,'Floor 4':.79,'Floor 3':.87,'Floor 2':.93,'Floor 1':.97};let cur='Floor 7';
-const SL=[[[577,241],[876,129],[1280,193]],[[587,327],[876,277],[1280,313]],[[595,414],[876,396],[1280,411]],[[604,499],[876,541],[1280,518]],[[613,589],[876,668],[1280,618]],[[622,672],[876,803],[1280,715]],[[630,747],[876,900],[1280,805]],[[638,818],[876,985],[1280,885]],[[645,882],[876,1060],[1280,960]],[[652,940],[876,1130],[1280,1030]]],FI={'Penthouse':0,'Floor 8':1,'Floor 7':2,'Floor 6':3,'Floor 5':4,'Floor 4':5,'Floor 3':6,'Floor 2':7,'Floor 1':8};
-function fpoly(f){if(f==='Rooftop')return[[758,108],[952,65],[1188,116],[1188,175],[876,129],[758,158]];const a=SL[FI[f]],b=SL[FI[f]+1];return[...a,...b.slice().reverse()]}
-function band(){const W=innerWidth,H=innerHeight,sw=M?506:1600,sh=900,xo=M?547:0,s=Math.max(W/sw,H/sh),rad=ang*Math.PI/180,shx=oready?0:Math.sin(rad)*W*.14,ox=(W-sw*s)/2+shx,oy=(H-sh*s)/2,pts=fpoly(cur);fbn.style.left=(ox-xo*s)+'px';fbn.style.top=oy+'px';fbn.style.width=(1600*s)+'px';fbn.style.height=(sh*s)+'px';fbn.style.transform=`perspective(1200px) rotateY(${(!oready?Math.sin(rad)*18:0).toFixed(2)}deg)`;fbn.querySelector('polygon').setAttribute('points',pts.map(q=>q.join(',')).join(' '));const ys=pts.map(q=>q[1]),sp=fbn.querySelector('span');sp.style.top=Math.min(92,(Math.min(...ys)+Math.max(...ys))/2/9)+'%';const tn=sp.firstChild;tn.nodeValue=cur;orig.delete(tn);if(typeof walk==='function')walk()}
+const fbn=document.getElementById('fband'),FP={'Rooftop':.07,'Penthouse':.13,'Floor 8':.20,'Floor 7':.26,'Floor 6':.33,'Floor 5':.41,'Floor 4':.49,'Floor 3':.56,'Floor 2':.64,'Floor 1':.75};let cur='Floor 7';
+const SL=[[[582,82],[1036,82]],[[582,146],[1036,146]],[[582,208],[1036,208]],[[582,272],[1036,272]],[[582,336],[1036,336]],[[582,406],[1036,406]],[[582,474],[1036,474]],[[582,538],[1036,538]],[[582,606],[1036,606]],[[582,742],[1036,742]]],FI={'Penthouse':0,'Floor 8':1,'Floor 7':2,'Floor 6':3,'Floor 5':4,'Floor 4':5,'Floor 3':6,'Floor 2':7,'Floor 1':8};
+function fpoly(f){if(f==='Rooftop')return[[605,58],[1010,58],[1036,82],[582,82]];const a=SL[FI[f]],b=SL[FI[f]+1];return[...a,...b.slice().reverse()]}
+function band(){const W=innerWidth,H=innerHeight,sw=M?506:1600,sh=900,xo=M?547:0,s=Math.max(W/sw,H/sh),rad=ang*Math.PI/180,shx=oready?0:Math.sin(rad)*W*.14,ox=(W-sw*s)/2+shx,oy=(H-sh*s)/2,pts=fpoly(cur);fbn.style.left=(ox-xo*s)+'px';fbn.style.top=oy+'px';fbn.style.width=(1600*s)+'px';fbn.style.height=(sh*s)+'px';fbn.style.transform=`perspective(1200px) rotateY(${(!oready?Math.sin(rad)*18:0).toFixed(2)}deg)`;fbn.querySelector('polygon').setAttribute('points',pts.map(q=>q.join(',')).join(' '));const ys=pts.map(q=>q[1]),sp=fbn.querySelector('span');sp.style.top=Math.min(92,(Math.min(...ys)+Math.max(...ys))/2/9)+'%';sp.style.left='65.8%';const tn=sp.firstChild;tn.nodeValue=cur;orig.delete(tn);if(typeof walk==='function')walk()}
 const FV={'Rooftop':['rooftop',98],'Penthouse':['penthouse',100]};let fimgs=null,fready=false,FN=100;
 function loadFloor(){fready=false;fimgs=null;const ent=FV[cur];if(!ent)return;const[k,cnt]=ent;FN=cnt;const go=document.querySelector('#floors .go');go.disabled=true;go.style.opacity=.6;const done=()=>{if(!FV[cur]||FV[cur][0]!==k)return;fready=true;last=-1;go.disabled=false;go.style.opacity=''};
  const sub=M?('f/'+k+'/'):('f/'+k+'_d/'),a=[];let n=0;for(let i=0;i<FN;i++){const im=new Image();im.onload=im.onerror=()=>{if(++n>=FN)done()};im.src=sub+String(i+1).padStart(3,'0')+'.jpg';a[i]=im}fimgs=a}
